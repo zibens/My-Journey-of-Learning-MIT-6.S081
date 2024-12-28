@@ -40,7 +40,6 @@ getcmdd(char *buf, int nbuf)
     return -1;
   return 0;
 }
-
 int main(int argc , char * argv[]){
     //xargs grep hello
     if(argc < 2){
