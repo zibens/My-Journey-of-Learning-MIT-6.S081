@@ -1,7 +1,7 @@
 #include "kernel/types.h"
 #include "kernel/stat.h"
 #include "user/user.h"
-
+//echo hello > ...
 int
 main(int argc, char *argv[])
 {
@@ -15,5 +15,6 @@ main(int argc, char *argv[])
       write(1, "\n", 1);
     }
   }
+  
   exit(0);
 }

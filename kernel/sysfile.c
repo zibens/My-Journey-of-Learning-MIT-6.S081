@@ -109,10 +109,10 @@ sys_fstat(void)
 {
   struct file *f;
   uint64 st; // user pointer to struct stat
-
+  //从系统调用中获取文件描述符， 并转换为内核中的struct file指针
   if(argfd(0, 0, &f) < 0 || argaddr(1, &st) < 0)
     return -1;
-  return filestat(f, st);
+  return filestat(f, st); //将文件的状态信息填充到用户空间提供的结构体中
 }
 
 // Create the path new as a link to the same inode as old.
