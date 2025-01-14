@@ -19,8 +19,8 @@ struct run {
 };
 
 struct {
-  struct spinlock lock;
-  struct run *freelist;
+  struct spinlock lock; //锁 避免两个线程同时操作
+  struct run *freelist; //链表
 } kmem;
 
 void
@@ -34,7 +34,7 @@ void
 freerange(void *pa_start, void *pa_end)
 {
   char *p;
-  p = (char*)PGROUNDUP((uint64)pa_start);
+  p = (char*)PGROUNDUP((uint64)pa_start); //这个只是拿到非12位的剩下的高位
   for(; p + PGSIZE <= (char*)pa_end; p += PGSIZE)
     kfree(p);
 }
@@ -43,6 +43,7 @@ freerange(void *pa_start, void *pa_end)
 // which normally should have been returned by a
 // call to kalloc().  (The exception is when
 // initializing the allocator; see kinit above.)
+//释放掉物理内存
 void
 kfree(void *pa)
 {

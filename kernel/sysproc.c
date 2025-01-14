@@ -7,6 +7,8 @@
 #include "spinlock.h"
 #include "proc.h"
 
+extern pte_t * walk();
+
 uint64
 sys_exit(void)
 {
@@ -77,10 +79,39 @@ sys_sleep(void)
 
 
 #ifdef LAB_PGTBL
+/*
+  这个系统调用，用于报告哪些页面已被访问。
+*/
 int
 sys_pgaccess(void)
 {
+  uint64 strat_va;
+  int num_pages;
+  uint64 mask;
+  
+  pagetable_t pagetable = myproc()->pagetable;
+
   // lab pgtbl: your code here.
+  if(argaddr(0 , &strat_va) < 0)
+    return -1;
+  if(argint(1 , &num_pages) < 0)
+    return -1;
+  if(argaddr(2 , &mask) < 0)
+    return -1;
+  if(num_pages > 64)return -1;
+
+  uint64 ans = 0;
+
+  for(int i =0;i<num_pages;++i){
+    uint64 now_va = strat_va + PGSIZE*i;
+    pte_t * pte= walk(pagetable , now_va,1);
+    if(*pte &PTE_A){
+      ans |= (1L << i);
+      *pte = *pte &(~PTE_A);
+    }
+  }
+  copyout(pagetable , mask,(char *)&ans,sizeof(uint64));
+  
   return 0;
 }
 #endif
@@ -107,3 +138,4 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
